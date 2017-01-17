@@ -14,7 +14,7 @@
     "main": "main.ts",
     "test": "test.ts",
     "tsconfig": "tsconfig.json",
-    "prefix": "app",
+    "prefix": "breakout",
     "mobile": false,
     "styles": [
       "styles.scss"
