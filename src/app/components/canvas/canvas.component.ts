@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 
 @Component({
     selector: 'breakout-canvas',
@@ -8,12 +8,38 @@ import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angula
 export class CanvasComponent implements AfterViewInit, OnInit {
     @ViewChild('bkCanvas') canvasElement: ElementRef;
 
-    ballRadius = 10;
     context: CanvasRenderingContext2D;
     x: number;
     y: number;
     dx: number;
     dy: number;
+
+    ballRadius: number = 10;
+
+    paddleHeight: number = 10;
+    paddleWidth: number = 75;
+    paddleX: number;
+
+    leftPressed: boolean = false;
+    rightPressed: boolean = false;
+
+    @HostListener('document:keydown', ['$event'])
+    handleKeydownEvent(event: KeyboardEvent) {
+        if (event.keyCode === 39) {
+            this.rightPressed = true;
+        } else if (+event.keyCode === 37) {
+            this.leftPressed = true;
+        }
+    };
+
+    @HostListener('document:keyup', ['$event'])
+    handleKeyupEvent(event: KeyboardEvent) {
+        if (event.keyCode === 39) {
+            this.rightPressed = false;
+        } else if (+event.keyCode === 37) {
+            this.leftPressed = false;
+        }
+    };
 
     constructor() { }
 
@@ -26,6 +52,7 @@ export class CanvasComponent implements AfterViewInit, OnInit {
         this.y = this.context.canvas.height - 30;
         this.dx = 2;
         this.dy = -2;
+        this.paddleX = (this.context.canvas.width - this.paddleWidth) / 2;
 
         setInterval(() => this.draw(), 10);
     }
@@ -37,11 +64,12 @@ export class CanvasComponent implements AfterViewInit, OnInit {
     private draw(): void {
         this.clearCanvas();
         this.drawBall();
+        this.drawPaddle();
 
         this.x += this.dx;
         this.y += this.dy;
 
-        this.writeDebug();
+        // this.writeDebug();
 
         if (this.x + this.dx > this.context.canvas.width - this.ballRadius || this.x + this.dx < this.ballRadius) {
             this.dx = -this.dx;
@@ -50,11 +78,25 @@ export class CanvasComponent implements AfterViewInit, OnInit {
         if (this.y + this.dy > this.context.canvas.height - this.ballRadius || this.y + this.dy < this.ballRadius) {
             this.dy = -this.dy;
         }
+
+        if (this.rightPressed && this.paddleX < this.context.canvas.width - this.paddleWidth) {
+            this.paddleX += 7;
+        } else if (this.leftPressed && this.paddleX > 0) {
+            this.paddleX -= 7;
+        }
     }
 
     private drawBall(): void {
         this.context.beginPath();
         this.context.arc(this.x, this.y, this.ballRadius, 0, Math.PI * 2);
+        this.context.fillStyle = '#0095DD';
+        this.context.fill();
+        this.context.closePath();
+    }
+
+    private drawPaddle(): void {
+        this.context.beginPath();
+        this.context.rect(this.paddleX, this.context.canvas.height - this.paddleHeight, this.paddleWidth, this.paddleHeight);
         this.context.fillStyle = '#0095DD';
         this.context.fill();
         this.context.closePath();
