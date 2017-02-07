@@ -23,6 +23,16 @@ export class CanvasComponent implements AfterViewInit, OnInit {
     leftPressed: boolean = false;
     rightPressed: boolean = false;
 
+    brickRowCount = 3;
+    brickColumnCount = 8;
+    brickWidth = 75;
+    brickHeight = 20;
+    brickPadding = 9;
+    brickOffsetTop = 30;
+    brickOffsetLeft = 30;
+
+    bricks = [];
+
     @HostListener('document:keydown', ['$event'])
     handleKeydownEvent(event: KeyboardEvent) {
         if (event.keyCode === 39) {
@@ -43,7 +53,15 @@ export class CanvasComponent implements AfterViewInit, OnInit {
 
     constructor() { }
 
-    ngOnInit() { }
+    ngOnInit() {
+        for (let i = 0; i < this.brickColumnCount; i++) {
+            this.bricks[i] = [];
+
+            for (let j = 0; j < this.brickRowCount; j++) {
+                this.bricks[i][j] = { x: 0, y: 0 };
+            }
+        }
+    }
 
     ngAfterViewInit() {
         this.context = this.canvasElement.nativeElement.getContext('2d');
@@ -63,6 +81,7 @@ export class CanvasComponent implements AfterViewInit, OnInit {
 
     private draw(): void {
         this.clearCanvas();
+        this.drawBricks();
         this.drawBall();
         this.drawPaddle();
 
@@ -102,6 +121,21 @@ export class CanvasComponent implements AfterViewInit, OnInit {
         this.context.fillStyle = '#0095DD';
         this.context.fill();
         this.context.closePath();
+    }
+
+    private drawBricks(): void {
+        for (let c = 0; c < this.brickColumnCount; c++) {
+            for (let r = 0; r < this.brickRowCount; r++) {
+                this.bricks[c][r].x = (c * (this.brickWidth + this.brickPadding)) + this.brickOffsetLeft;
+                this.bricks[c][r].y = (r * (this.brickHeight + this.brickPadding)) + this.brickOffsetTop;
+
+                this.context.beginPath();
+                this.context.rect(this.bricks[c][r].x, this.bricks[c][r].y, this.brickWidth, this.brickHeight);
+                this.context.fillStyle = '#0095DD';
+                this.context.fill();
+                this.context.closePath();
+            }
+        }
     }
 
     private drawPaddle(): void {
