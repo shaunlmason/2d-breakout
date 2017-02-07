@@ -71,14 +71,24 @@ export class CanvasComponent implements AfterViewInit, OnInit {
 
         // this.writeDebug();
 
+        // Check Left/Right
         if (this.x + this.dx > this.context.canvas.width - this.ballRadius || this.x + this.dx < this.ballRadius) {
             this.dx = -this.dx;
         }
 
-        if (this.y + this.dy > this.context.canvas.height - this.ballRadius || this.y + this.dy < this.ballRadius) {
+        // Check Top/Bottom
+        if (this.y + this.dy < this.ballRadius) {
             this.dy = -this.dy;
+        } else if (this.y + this.dy > this.context.canvas.height - this.ballRadius) {
+            if (this.x > this.paddleX && this.x < this.paddleX + this.paddleWidth) {
+                this.dy = -this.dy;
+            } else {
+                alert('GAME OVER');
+                document.location.reload();
+            }
         }
 
+        // Check Paddle Left/Right
         if (this.rightPressed && this.paddleX < this.context.canvas.width - this.paddleWidth) {
             this.paddleX += 7;
         } else if (this.leftPressed && this.paddleX > 0) {
