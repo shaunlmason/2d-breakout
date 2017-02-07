@@ -58,7 +58,7 @@ export class CanvasComponent implements AfterViewInit, OnInit {
             this.bricks[i] = [];
 
             for (let j = 0; j < this.brickRowCount; j++) {
-                this.bricks[i][j] = { x: 0, y: 0 };
+                this.bricks[i][j] = { x: 0, y: 0, status: 1 };
             }
         }
     }
@@ -79,11 +79,26 @@ export class CanvasComponent implements AfterViewInit, OnInit {
         this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
     }
 
+    private collisionDetection() {
+        for (let c = 0; c < this.brickColumnCount; c++) {
+            for (let r = 0; r < this.brickRowCount; r++) {
+                const brick = this.bricks[c][r];
+                if (brick.status === 1) {
+                    if (this.x > brick.x && this.x < brick.x + this.brickWidth && this.y < brick.y + this.brickHeight) {
+                        this.dy = -this.dy;
+                        brick.status = 0;
+                    }
+                }
+            }
+        }
+    }
+
     private draw(): void {
         this.clearCanvas();
         this.drawBricks();
         this.drawBall();
         this.drawPaddle();
+        this.collisionDetection();
 
         this.x += this.dx;
         this.y += this.dy;
@@ -126,14 +141,16 @@ export class CanvasComponent implements AfterViewInit, OnInit {
     private drawBricks(): void {
         for (let c = 0; c < this.brickColumnCount; c++) {
             for (let r = 0; r < this.brickRowCount; r++) {
-                this.bricks[c][r].x = (c * (this.brickWidth + this.brickPadding)) + this.brickOffsetLeft;
-                this.bricks[c][r].y = (r * (this.brickHeight + this.brickPadding)) + this.brickOffsetTop;
+                if (this.bricks[c][r].status === 1) {
+                    this.bricks[c][r].x = (c * (this.brickWidth + this.brickPadding)) + this.brickOffsetLeft;
+                    this.bricks[c][r].y = (r * (this.brickHeight + this.brickPadding)) + this.brickOffsetTop;
 
-                this.context.beginPath();
-                this.context.rect(this.bricks[c][r].x, this.bricks[c][r].y, this.brickWidth, this.brickHeight);
-                this.context.fillStyle = '#0095DD';
-                this.context.fill();
-                this.context.closePath();
+                    this.context.beginPath();
+                    this.context.rect(this.bricks[c][r].x, this.bricks[c][r].y, this.brickWidth, this.brickHeight);
+                    this.context.fillStyle = '#0095DD';
+                    this.context.fill();
+                    this.context.closePath();
+                }
             }
         }
     }
