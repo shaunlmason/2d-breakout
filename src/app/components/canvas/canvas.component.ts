@@ -8,6 +8,7 @@ import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angula
 export class CanvasComponent implements AfterViewInit, OnInit {
     @ViewChild('bkCanvas') canvasElement: ElementRef;
 
+    ballRadius = 10;
     context: CanvasRenderingContext2D;
     x: number;
     y: number;
@@ -39,38 +40,29 @@ export class CanvasComponent implements AfterViewInit, OnInit {
 
         this.x += this.dx;
         this.y += this.dy;
+
+        this.writeDebug();
+
+        if (this.x + this.dx > this.context.canvas.width - this.ballRadius || this.x + this.dx < this.ballRadius) {
+            this.dx = -this.dx;
+        }
+
+        if (this.y + this.dy > this.context.canvas.height - this.ballRadius || this.y + this.dy < this.ballRadius) {
+            this.dy = -this.dy;
+        }
     }
 
     private drawBall(): void {
         this.context.beginPath();
-        this.context.arc(this.x, this.y, 10, 0, Math.PI * 2);
+        this.context.arc(this.x, this.y, this.ballRadius, 0, Math.PI * 2);
         this.context.fillStyle = '#0095DD';
         this.context.fill();
         this.context.closePath();
     }
 
-    // private drawGreenCircle(): void {
-    //     this.context.beginPath();
-    //     this.context.arc(240, 160, 20, 0, Math.PI * 2, false);
-    //     this.context.fillStyle = 'green';
-    //     this.context.fill();
-    //     this.context.closePath();
-    // }
-
-    // private drawRedSquare(): void {
-    //     this.context.beginPath();
-    //     this.context.rect(20, 40, 50, 50);
-    //     this.context.fillStyle = '#FF0000';
-    //     this.context.fill();
-    //     this.context.closePath();
-    // }
-
-    // private drawRectangleWithOpacity(): void {
-    //     this.context.beginPath();
-    //     this.context.rect(160, 10, 100, 40);
-    //     this.context.strokeStyle = 'rgba(0, 0, 255, 0.5)';
-    //     this.context.stroke();
-    //     this.context.closePath();
-    // }
+    private writeDebug() {
+        console.log(`x: ${this.x}`);
+        console.log(`y: ${this.y}`);
+    }
 
 }
