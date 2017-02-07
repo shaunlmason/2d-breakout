@@ -92,7 +92,8 @@ export class CanvasComponent implements AfterViewInit, OnInit {
         this.dy = -2;
         this.paddleX = (this.context.canvas.width - this.paddleWidth) / 2;
 
-        setInterval(() => this.draw(), 10);
+        // setInterval(() => this.draw(), 10);
+        this.draw();
     }
 
     private clearCanvas(): void {
@@ -166,6 +167,8 @@ export class CanvasComponent implements AfterViewInit, OnInit {
         } else if (this.leftPressed && this.paddleX > 0) {
             this.paddleX -= 7;
         }
+
+        requestAnimationFrame(() => this.draw());
     }
 
     private drawBall(): void {
