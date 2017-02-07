@@ -8,6 +8,8 @@ import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild }
 export class CanvasComponent implements AfterViewInit, OnInit {
     @ViewChild('bkCanvas') canvasElement: ElementRef;
 
+    score = 0;
+
     context: CanvasRenderingContext2D;
     x: number;
     y: number;
@@ -87,6 +89,12 @@ export class CanvasComponent implements AfterViewInit, OnInit {
                     if (this.x > brick.x && this.x < brick.x + this.brickWidth && this.y < brick.y + this.brickHeight) {
                         this.dy = -this.dy;
                         brick.status = 0;
+                        this.score++;
+
+                        if (this.score === this.brickRowCount * this.brickColumnCount) {
+                            alert('YOU WIN, CONGRATULATIONS!');
+                            document.location.reload();
+                        }
                     }
                 }
             }
@@ -98,6 +106,7 @@ export class CanvasComponent implements AfterViewInit, OnInit {
         this.drawBricks();
         this.drawBall();
         this.drawPaddle();
+        this.drawScore();
         this.collisionDetection();
 
         this.x += this.dx;
@@ -161,6 +170,12 @@ export class CanvasComponent implements AfterViewInit, OnInit {
         this.context.fillStyle = '#0095DD';
         this.context.fill();
         this.context.closePath();
+    }
+
+    private drawScore() {
+        this.context.font = '16px Arial';
+        this.context.fillStyle = '#0095DD';
+        this.context.fillText('Score: ' + this.score, 8, 20);
     }
 
     private writeDebug() {
