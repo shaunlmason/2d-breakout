@@ -9,6 +9,7 @@ export class CanvasComponent implements AfterViewInit, OnInit {
     @ViewChild('bkCanvas') canvasElement: ElementRef;
 
     score = 0;
+    lives = 3;
 
     context: CanvasRenderingContext2D;
     x: number;
@@ -35,6 +36,8 @@ export class CanvasComponent implements AfterViewInit, OnInit {
 
     bricks = [];
 
+    lastMousePosition = [0, 0];
+
     @HostListener('document:keydown', ['$event'])
     handleKeydownEvent(event: KeyboardEvent) {
         if (event.keyCode === 39) {
@@ -55,6 +58,12 @@ export class CanvasComponent implements AfterViewInit, OnInit {
 
     @HostListener('document:mousemove', ['$event'])
     handleMousMoveEvent(event: MouseEvent) {
+        if (this.lastMousePosition[0] === event.clientX && this.lastMousePosition[1] === event.clientY) {
+            return;
+        } else {
+            this.lastMousePosition = [event.clientX, event.clientY];
+        }
+
         const relativeX = event.clientX - this.context.canvas.offsetLeft;
 
         if (relativeX > 0 && relativeX < this.context.canvas.width) {
@@ -83,7 +92,8 @@ export class CanvasComponent implements AfterViewInit, OnInit {
         this.dy = -2;
         this.paddleX = (this.context.canvas.width - this.paddleWidth) / 2;
 
-        setInterval(() => this.draw(), 10);
+        // setInterval(() => this.draw(), 10);
+        this.draw();
     }
 
     private clearCanvas(): void {
@@ -116,6 +126,7 @@ export class CanvasComponent implements AfterViewInit, OnInit {
         this.drawBall();
         this.drawPaddle();
         this.drawScore();
+        this.drawLives();
         this.collisionDetection();
 
         this.x += this.dx;
@@ -135,8 +146,18 @@ export class CanvasComponent implements AfterViewInit, OnInit {
             if (this.x > this.paddleX && this.x < this.paddleX + this.paddleWidth) {
                 this.dy = -this.dy;
             } else {
-                alert('GAME OVER');
-                document.location.reload();
+                this.lives--;
+
+                if (this.lives <= 0) {
+                    alert('GAME OVER');
+                    document.location.reload();
+                } else {
+                    this.x = this.context.canvas.width / 2;
+                    this.y = this.context.canvas.height - 30;
+                    this.dx = 2;
+                    this.dy = -2;
+                    this.paddleX = (this.context.canvas.width - this.paddleWidth) / 2;
+                }
             }
         }
 
@@ -146,6 +167,8 @@ export class CanvasComponent implements AfterViewInit, OnInit {
         } else if (this.leftPressed && this.paddleX > 0) {
             this.paddleX -= 7;
         }
+
+        requestAnimationFrame(() => this.draw());
     }
 
     private drawBall(): void {
@@ -181,13 +204,19 @@ export class CanvasComponent implements AfterViewInit, OnInit {
         this.context.closePath();
     }
 
-    private drawScore() {
+    private drawLives(): void {
+        this.context.font = '16px Arial';
+        this.context.fillStyle = '#0095DD';
+        this.context.fillText('Lives: ' + this.lives, this.context.canvas.width - 65, 20);
+    }
+
+    private drawScore(): void {
         this.context.font = '16px Arial';
         this.context.fillStyle = '#0095DD';
         this.context.fillText('Score: ' + this.score, 8, 20);
     }
 
-    private writeDebug() {
+    private writeDebug(): void {
         console.log(`x: ${this.x}`);
         console.log(`y: ${this.y}`);
     }
