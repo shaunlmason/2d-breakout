@@ -53,6 +53,15 @@ export class CanvasComponent implements AfterViewInit, OnInit {
         }
     };
 
+    @HostListener('document:mousemove', ['$event'])
+    handleMousMoveEvent(event: MouseEvent) {
+        const relativeX = event.clientX - this.context.canvas.offsetLeft;
+
+        if (relativeX > 0 && relativeX < this.context.canvas.width) {
+            this.paddleX = relativeX - this.paddleWidth / 2;
+        }
+    }
+
     constructor() { }
 
     ngOnInit() {
